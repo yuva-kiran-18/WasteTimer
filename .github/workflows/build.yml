@@ -3,8 +3,10 @@ name: Android CI Build
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+
+# THIS IS THE MAGIC KEY: It allows the action to create a Release
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -24,11 +26,15 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Build with Gradle (Release APK)
-      run: ./gradlew assembleRelease
+    # Build a Debug APK so Android accepts the signature automatically
+    - name: Build Debug APK for Obtainium
+      run: ./gradlew assembleDebug
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
+    - name: Publish Release for Obtainium
+      uses: softprops/action-gh-release@v1
       with:
-        name: WasteTimer-Release-APK
-        path: app/build/outputs/apk/release/app-release-unsigned.apk
+        tag_name: "v1.0.${{ github.run_number }}"
+        name: "WasteTimer Update #${{ github.run_number }}"
+        files: app/build/outputs/apk/debug/app-debug.apk
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
