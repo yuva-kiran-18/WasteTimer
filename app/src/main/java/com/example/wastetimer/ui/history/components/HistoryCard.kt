@@ -25,7 +25,7 @@ import com.example.wastetimer.utils.TimeFormatter
 
 @Composable
 fun HistoryCard(
-    item: HistoryItem,
+    item: TrackingPeriodUiModel,
     onExpand: () -> Unit,
     onDelete: () -> Unit
 ) {
