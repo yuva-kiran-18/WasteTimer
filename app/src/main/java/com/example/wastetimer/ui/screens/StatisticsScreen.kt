@@ -19,46 +19,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.wastetimer.viewmodel.MainViewModel
 
 @Composable
-fun StatisticsScreen(
-    viewModel: MainViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
-) {
-    // In a full production app, these would be collected from the ViewModel
-    // representing Room Database aggregates.
-    val mockWeeklyData = listOf(120f, 45f, 200f, 80f, 150f, 30f, 90f) // Minutes wasted
-    
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        item {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                TextButton(onClick = onNavigateBack) { Text("← Back") }
-                Text("Analytics", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(start = 16.dp))
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        item {
-            Text("Last 7 Days (Minutes)", fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 16.dp))
-            BarChart(data = mockWeeklyData)
-            Spacer(modifier = Modifier.height(32.dp))
-        }
-
-        item {
-            Text("Lifetime Insights", fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                StatCard(title = "Most Productive Day", value = "Tuesday", color = Color(0xFF4CAF50), modifier = Modifier.weight(1f))
-                StatCard(title = "Highest Wasted Day", value = "Sunday", color = Color(0xFFF44336), modifier = Modifier.weight(1f))
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                StatCard(title = "Average Session", value = "14m 30s", color = MaterialTheme.colorScheme.primary, modifier = Modifier.weight(1f))
-                StatCard(title = "Total Sessions", value = "142", color = MaterialTheme.colorScheme.tertiary, modifier = Modifier.weight(1f))
-            }
-        }
-    }
+fun StatisticsScreen() {
+    Text("Statistics - Coming Soon")
 }
 
 @Composable
