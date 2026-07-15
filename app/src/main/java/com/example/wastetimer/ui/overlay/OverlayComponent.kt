@@ -22,7 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.consume
+import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -61,7 +61,7 @@ fun OverlayComponent(
             .clickable { isExpanded = !isExpanded }
             .pointerInput(Unit) {
                 detectDragGestures { change, dragAmount ->
-                    change.consume()
+                    change.consumeAllChanges()
                     offsetX += dragAmount.x
                     offsetY += dragAmount.y
                 }
