@@ -6,17 +6,24 @@ import java.util.Locale
 
 object TimeFormatter {
 
-    private val formatter = SimpleDateFormat(
-        "dd MMM yyyy, HH:mm",
+    private val dateFormatter = SimpleDateFormat(
+        "dd MMM yyyy",
         Locale.getDefault()
     )
 
-    fun formatDateTime(time: Long): String =
-        formatter.format(Date(time))
+    private val timeFormatter = SimpleDateFormat(
+        "HH:mm:ss",
+        Locale.getDefault()
+    )
 
-    fun formatDuration(duration: Long): String {
+    private val dateTimeFormatter = SimpleDateFormat(
+        "dd MMM yyyy HH:mm:ss",
+        Locale.getDefault()
+    )
 
-        val totalSeconds = duration / 1000
+    fun formatDuration(durationMillis: Long): String {
+
+        val totalSeconds = durationMillis / 1000
 
         val hours = totalSeconds / 3600
         val minutes = (totalSeconds % 3600) / 60
@@ -28,4 +35,13 @@ object TimeFormatter {
             seconds
         )
     }
+
+    fun formatDate(epochMillis: Long): String =
+        dateFormatter.format(Date(epochMillis))
+
+    fun formatTime(epochMillis: Long): String =
+        timeFormatter.format(Date(epochMillis))
+
+    fun formatDateTime(epochMillis: Long): String =
+        dateTimeFormatter.format(Date(epochMillis))
 }
