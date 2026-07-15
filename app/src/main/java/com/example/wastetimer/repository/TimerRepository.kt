@@ -1,60 +1,88 @@
 package com.example.wastetimer.repository
 
-import com.example.wastetimer.data.local.ResetPeriodEntity
-import com.example.wastetimer.data.local.SessionEntity
-import com.example.wastetimer.data.local.TimerDao
+import com.example.wastetimer.data.local.dao.SessionDao
+import com.example.wastetimer.data.local.dao.TrackingPeriodDao
+import com.example.wastetimer.data.local.entity.SessionEntity
+import com.example.wastetimer.data.local.entity.TrackingPeriodEntity
+import com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class TimerRepository @Inject constructor(
-    private val timerDao: TimerDao
+    private val sessionDao: SessionDao,
+    private val trackingPeriodDao: TrackingPeriodDao
 ) {
-    suspend fun saveSession(periodId: Long, startTime: Long, endTime: Long) {
-        require(endTime >= startTime) { "End time cannot be earlier than start time" }
 
-        val duration = endTime - startTime
-        val session = SessionEntity(
-            periodId = periodId,
-            startTimeEpochMillis = startTime,
-            endTimeEpochMillis = endTime,
-            durationMillis = duration
-        )
-        timerDao.insertSession(session)
-    }
+    suspend fun getOrCreateActivePeriod(): TrackingPeriodEntity {
 
-    suspend fun getOrCreateActivePeriodId(): Long {
-        val activePeriodId = timerDao.getLatestResetPeriodId()
-        return activePeriodId ?: createNewResetPeriod()
-    }
+        val existing = trackingPeriodDao.getActivePeriod()
 
-    suspend fun createNewResetPeriod(): Long {
-        val newPeriod = ResetPeriodEntity(
-            resetDateEpochMillis = System.currentTimeMillis(),
-            totalWastedTimeMillis = 0L,
-            note = null
-        )
-        return timerDao.insertResetPeriod(newPeriod)
-    }
-
-    suspend fun resetTracking(): Long {
-        val lastPeriodId = timerDao.getLatestResetPeriodId()
-
-        if (lastPeriodId != null) {
-            val total = timerDao.getPeriodTotalOnce(lastPeriodId) ?: 0L
-            timerDao.updatePeriodTotal(lastPeriodId, total)
-            timerDao.updatePeriodResetTotal(lastPeriodId, total)
+        if (existing != null) {
+            return existing
         }
 
-        return createNewResetPeriod()
+        val id = trackingPeriodDao.insertPeriod(
+            TrackingPeriodEntity(
+                createdAt = System.currentTimeMillis()
+            )
+        )
+
+        return TrackingPeriodEntity(
+            id = id,
+            createdAt = System.currentTimeMillis()
+        )
     }
 
-    fun getSessionsForPeriod(periodId: Long): Flow<List<SessionEntity>> {
-        return timerDao.getSessionsForPeriod(periodId)
+    suspend fun saveSession(
+        startTime: Long,
+        endTime: Long
+    ) {
+
+        val period = getOrCreateActivePeriod()
+
+        sessionDao.insertSession(
+            SessionEntity(
+                trackingPeriodId = period.id,
+                startTime = startTime,
+                endTime = endTime,
+                duration = endTime - startTime
+            )
+        )
     }
 
-    fun getTotalTimeForPeriod(periodId: Long): Flow<Long?> {
-        return timerDao.getTotalTimeForPeriod(periodId)
+    suspend fun resetTracking() {
+
+        val active = trackingPeriodDao.getActivePeriod()
+            ?: return
+
+        val totalDuration =
+            sessionDao.getTotalDuration(active.id)
+
+        trackingPeriodDao.closePeriod(
+            periodId = active.id,
+            endedAt = System.currentTimeMillis(),
+            totalDuration = totalDuration
+        )
+
+        trackingPeriodDao.insertPeriod(
+            TrackingPeriodEntity(
+                createdAt = System.currentTimeMillis()
+            )
+        )
     }
+
+    fun getAllTrackingPeriods():
+            Flow<List<TrackingPeriodEntity>> =
+        trackingPeriodDao.getAllPeriods()
+
+    fun getTrackingPeriodsWithSessions():
+            Flow<List<TrackingPeriodWithSessions>> =
+        trackingPeriodDao.getPeriodsWithSessions()
+
+    fun getSessionsForPeriod(
+        periodId: Long
+    ): Flow<List<SessionEntity>> =
+        sessionDao.getSessionsForPeriod(periodId)
 }
