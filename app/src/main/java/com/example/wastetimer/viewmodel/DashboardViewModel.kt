@@ -3,14 +3,16 @@ package com.example.wastetimer.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wastetimer.data.model.DashboardState
+import com.example.wastetimer.data.repository.TimerRepository
 import com.example.wastetimer.service.TimerForegroundService
+import com.example.wastetimer.utils.TimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.wastetimer.data.repository.TimerRepository
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
@@ -18,7 +20,7 @@ class DashboardViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardState())
-    val uiState: StateFlow<DashboardState> = _uiState
+    val uiState: StateFlow<DashboardState> = _uiState.asStateFlow()
 
     init {
         observeDashboard()
@@ -28,33 +30,47 @@ class DashboardViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            while (true) {
+            combine(
 
-                val activePeriod =
-                    repository.getActiveTrackingPeriod()
+                TimerForegroundService.elapsedTime,
 
-                val totalDuration =
-                    repository.getCurrentPeriodTotalDuration()
+                repository.observeTrackingPeriods()
 
-                val sessionCount =
-                    repository.getCurrentSessionCount()
+            ) { elapsed, _ ->
 
-                _uiState.value = DashboardState(
-                    activePeriodId = activePeriod?.id ?: 0L,
-                    totalWastedMillis = totalDuration,
-                    sessionCount = sessionCount,
-                    currentSessionMillis = TimerForegroundService.elapsedTime.value,
+                val total = repository.getCurrentPeriodTotalDuration()
+                val sessions = repository.getCurrentSessionCount()
+
+                DashboardState(
+
+                    currentSession = TimeFormatter.formatDuration(elapsed),
+
+                    totalTime = TimeFormatter.formatDuration(total),
+
+                    sessionCount = sessions,
+
                     isTracking = TimerForegroundService.isRunning
+
                 )
 
-                delay(1000)
+            }.collect {
+
+                _uiState.value = it
+
             }
+
         }
+
     }
 
     fun resetTracking() {
+
         viewModelScope.launch {
+
             repository.resetTracking()
+
         }
+
     }
+
 }
