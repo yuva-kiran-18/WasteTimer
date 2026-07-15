@@ -71,11 +71,14 @@ class MainActivity : ComponentActivity() {
                     onNavigateToHistory = { /* navController.navigate("history") */ },
                     isServiceRunning = isServiceRunning,
                     onToggleService = {
-                        val action = if (isServiceRunning) "ACTION_STOP" else "ACTION_START"
                         val intent = Intent(this@MainActivity, TimerForegroundService::class.java).apply {
-                            this.action = action
+                            action = if (isServiceRunning) {
+                                TimerForegroundService.ACTION_STOP
+                            } else {
+                                TimerForegroundService.ACTION_START
+                            }
                         }
-                        startService(intent)
+                        startForegroundService(intent)
                     }
                 )
             }
