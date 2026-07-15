@@ -5,7 +5,6 @@ import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.example.wastetimer.service.TimerForegroundService
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class WasteTileService : TileService() {
@@ -17,11 +16,13 @@ class WasteTileService : TileService() {
 
     override fun onClick() {
         super.onClick()
+
         val isRunning = TimerForegroundService.isRunning
         val intent = Intent(this, TimerForegroundService::class.java).apply {
-            action = if (isRunning) "ACTION_STOP" else "ACTION_START"
+            action = if (isRunning) TimerForegroundService.ACTION_STOP else TimerForegroundService.ACTION_START
         }
-        startService(intent)
+
+        startForegroundService(intent)
         updateTileState(!isRunning)
     }
 
