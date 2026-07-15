@@ -30,11 +30,11 @@ fun EmptyHistory() {
 
         Icon(
 
-            imageVector = Icons.Outlined.History,
+    imageVector = Icons.Default.Info,
 
-            contentDescription = null
+    contentDescription = null
 
-        )
+)
 
         Spacer(
             modifier = Modifier.height(16.dp)
