@@ -48,7 +48,17 @@ fun HistoryScreen(
         ) { period ->
 
             HistoryCard(
-                item = period
+            
+                item = period,
+            
+                onExpand = {
+            
+                    viewModel.toggleExpanded(
+                        period.periodId
+                    )
+            
+                }
+            
             )
 
         }
