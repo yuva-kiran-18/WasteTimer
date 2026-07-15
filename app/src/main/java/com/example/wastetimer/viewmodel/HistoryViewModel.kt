@@ -2,13 +2,14 @@ package com.example.wastetimer.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.wastetimer.data.model.TrackingPeriodUiModel
 import com.example.wastetimer.data.model.HistoryUiState
-import com.example.wastetimer.repository.TimerRepository
+import com.example.wastetimer.data.model.SessionUiModel
+import com.example.wastetimer.data.model.TrackingPeriodUiModel
+import com.example.wastetimer.data.repository.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import com.example.wastetimer.data.model.SessionHistoryItem
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,14 +18,14 @@ class HistoryViewModel @Inject constructor(
     private val repository: TimerRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HistoryState())
-    val uiState: StateFlow<HistoryState> = _uiState
+    private val _uiState = MutableStateFlow(HistoryUiState())
+    val uiState: StateFlow<HistoryUiState> = _uiState.asStateFlow()
 
     init {
-        loadHistory()
+        observeHistory()
     }
 
-    private fun loadHistory() {
+    private fun observeHistory() {
 
         viewModelScope.launch {
 
@@ -32,40 +33,40 @@ class HistoryViewModel @Inject constructor(
                 .getTrackingPeriodsWithSessions()
                 .collect { periods ->
 
-                    _uiState.value = HistoryState(
+                    _uiState.value = HistoryUiState(
 
                         periods = periods.map { period ->
-                        
-                            HistoryItem(
-                        
+
+                            TrackingPeriodUiModel(
+
                                 periodId = period.trackingPeriod.id,
-                        
+
                                 createdAt = period.trackingPeriod.createdAt,
-                        
+
                                 endedAt = period.trackingPeriod.endedAt,
-                        
+
                                 totalDuration = period.trackingPeriod.totalDurationMillis,
-                        
+
                                 sessionCount = period.sessions.size,
-                        
-                                sessions = period.sessions.map {
-                        
-                                    SessionHistoryItem(
-                        
-                                        sessionId = it.id,
-                        
-                                        startTime = it.startTime,
-                        
-                                        endTime = it.endTime,
-                        
-                                        duration = it.duration
-                        
+
+                                sessions = period.sessions.map { session ->
+
+                                    SessionUiModel(
+
+                                        sessionId = session.id,
+
+                                        startTime = session.startTime,
+
+                                        endTime = session.endTime,
+
+                                        duration = session.duration
+
                                     )
-                        
+
                                 }
-                        
+
                             )
-                        
+
                         },
 
                         isLoading = false
@@ -77,27 +78,31 @@ class HistoryViewModel @Inject constructor(
         }
 
     }
-    fun toggleExpanded(
-    periodId: Long
-    ) {
 
-    _uiState.value = _uiState.value.copy(
+    fun toggleExpanded(periodId: Long) {
 
-        periods = _uiState.value.periods.map {
+        _uiState.value = _uiState.value.copy(
 
-            if (it.periodId == periodId) {
+            periods = _uiState.value.periods.map {
 
-                it.copy(
-                    expanded = !it.expanded
-                )
+                if (it.periodId == periodId) {
 
-            } else it
+                    it.copy(
+                        expanded = !it.expanded
+                    )
 
-        }
+                } else {
 
-    )
+                    it
 
-}    
+                }
+
+            }
+
+        )
+
+    }
+
     fun deletePeriod(periodId: Long) {
 
         viewModelScope.launch {
