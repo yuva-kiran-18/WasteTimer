@@ -8,8 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +26,8 @@ import com.example.wastetimer.utils.TimeFormatter
 @Composable
 fun HistoryCard(
     item: HistoryItem,
-    onExpand: () -> Unit
+    onExpand: () -> Unit,
+    onDelete: () -> Unit
 ) {
 
     Card(
@@ -35,34 +40,52 @@ fun HistoryCard(
             modifier = Modifier.padding(16.dp)
         ) {
 
-            Text(
-                text = "Tracking Period #${item.periodId}",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Text(
+                    text = "Tracking Period #${item.periodId}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                IconButton(
+                    onClick = onDelete
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete"
+                    )
+                }
+
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             InfoRow(
-                title = "Started",
-                value = TimeFormatter.formatDateTime(item.createdAt)
+                "Started",
+                TimeFormatter.formatDateTime(item.createdAt)
             )
 
             item.endedAt?.let {
+
                 InfoRow(
-                    title = "Ended",
-                    value = TimeFormatter.formatDateTime(it)
+                    "Ended",
+                    TimeFormatter.formatDateTime(it)
                 )
+
             }
 
             InfoRow(
-                title = "Sessions",
-                value = item.sessionCount.toString()
+                "Sessions",
+                item.sessionCount.toString()
             )
 
             InfoRow(
-                title = "Total",
-                value = TimeFormatter.formatDuration(item.totalDuration)
+                "Total",
+                TimeFormatter.formatDuration(item.totalDuration)
             )
 
             if (item.expanded && item.sessions.isNotEmpty()) {
@@ -73,17 +96,21 @@ fun HistoryCard(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                item.sessions.forEach { session ->
+                item.sessions.forEach {
 
                     SessionItem(
-                        title = "Session #${session.sessionId}",
-                        duration = TimeFormatter.formatDuration(session.duration)
+                        title = "Session #${it.sessionId}",
+                        duration = TimeFormatter.formatDuration(it.duration)
                     )
 
                 }
+
             }
+
         }
+
     }
+
 }
 
 @Composable
@@ -99,15 +126,13 @@ private fun InfoRow(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
 
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Text(title)
 
         Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
+            value,
             fontWeight = FontWeight.SemiBold
         )
+
     }
+
 }
