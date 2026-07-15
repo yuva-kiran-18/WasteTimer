@@ -12,12 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.wastetimer.data.model.TrackingPeriodUiModel
-import com.example.wastetimer.data.model.SessionUiModel
-import com.example.wastetimer.data.model.HistoryUiState
 import com.example.wastetimer.ui.history.components.DeletePeriodDialog
 import com.example.wastetimer.ui.history.components.HistoryCard
 import com.example.wastetimer.viewmodel.HistoryViewModel
+import com.example.wastetimer.data.model.TrackingPeriodUiModel
+import com.example.wastetimer.data.model.SessionUiModel
+import com.example.wastetimer.data.model.HistoryUiState
 
 @Composable
 fun HistoryScreen(
