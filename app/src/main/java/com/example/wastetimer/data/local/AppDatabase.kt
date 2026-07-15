@@ -44,6 +44,21 @@ interface TimerDao {
 
     @Query("SELECT SUM(durationMillis) FROM sessions WHERE periodId = :periodId")
     fun getTotalTimeForPeriod(periodId: Long): Flow<Long?>
+
+    @Query("SELECT id FROM reset_periods ORDER BY resetDateEpochMillis DESC LIMIT 1")
+    suspend fun getLatestResetPeriodId(): Long?
+
+    @Query("SELECT SUM(durationMillis) FROM sessions WHERE periodId = :periodId")
+    suspend fun getPeriodTotalOnce(periodId: Long): Long?
+
+    @Query("SELECT SUM(durationMillis) FROM sessions WHERE periodId = (SELECT id FROM reset_periods ORDER BY resetDateEpochMillis DESC LIMIT 1)")
+    suspend fun getLatestPeriodTotalOnce(): Long?
+
+    @Query("UPDATE reset_periods SET totalWastedTimeMillis = :total WHERE id = :periodId")
+    suspend fun updatePeriodTotal(periodId: Long, total: Long)
+
+    @Query("UPDATE reset_periods SET totalWastedTimeMillis = :total WHERE id = :periodId")
+    suspend fun updatePeriodResetTotal(periodId: Long, total: Long)
 }
 
 @Database(entities = [ResetPeriodEntity::class, SessionEntity::class], version = 1, exportSchema = false)
