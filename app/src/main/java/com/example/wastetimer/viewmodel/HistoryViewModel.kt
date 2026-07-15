@@ -35,7 +35,7 @@ class HistoryViewModel @Inject constructor(
 
                     _uiState.value = HistoryUiState(
 
-                        periods = periods.map { period ->
+                        periods = periods.map { period: com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions ->
 
                             TrackingPeriodUiModel(
 
@@ -49,7 +49,7 @@ class HistoryViewModel @Inject constructor(
 
                                 sessionCount = period.sessions.size,
 
-                                sessions = period.sessions.map { session ->
+                                sessions = period.sessions.map { session: com.example.wastetimer.data.local.entity.SessionEntity ->
 
                                     SessionUiModel(
 
