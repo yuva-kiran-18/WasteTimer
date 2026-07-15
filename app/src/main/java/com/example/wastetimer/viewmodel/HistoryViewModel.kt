@@ -31,11 +31,10 @@ class HistoryViewModel @Inject constructor(
 
             repository
                 .getTrackingPeriodsWithSessions()
-                .collect { periods: List<com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions> ->
-
+                .collect { periods: List<TrackingPeriodWithSessions> ->
                     _uiState.value = HistoryUiState(
 
-                        periods = periods.map { period: com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions ->
+                        periods = periods.map { period: TrackingPeriodWithSessions ->
 
                             TrackingPeriodUiModel(
 
@@ -49,7 +48,7 @@ class HistoryViewModel @Inject constructor(
 
                                 sessionCount = period.sessions.size,
 
-                                sessions = period.sessions.map { session: com.example.wastetimer.data.local.entity.SessionEntity ->
+                                sessions = period.sessions.map { session: SessionEntity ->
 
                                     SessionUiModel(
 
@@ -112,5 +111,6 @@ class HistoryViewModel @Inject constructor(
         }
 
     }
+    fun refresh() = observeHistory()
 
 }
