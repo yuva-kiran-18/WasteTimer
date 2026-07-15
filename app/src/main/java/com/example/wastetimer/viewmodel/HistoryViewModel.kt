@@ -113,6 +113,8 @@ class HistoryViewModel @Inject constructor(
         }
 
     }
-    fun refresh() = observeHistory()
+    fun refresh() {
+    observeHistory()
+}
 
 }
