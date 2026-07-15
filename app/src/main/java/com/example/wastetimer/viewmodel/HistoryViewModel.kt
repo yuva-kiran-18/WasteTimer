@@ -33,20 +33,38 @@ class HistoryViewModel @Inject constructor(
 
                     _uiState.value = HistoryState(
 
-                        periods = periods.map {
-
+                        periods = periods.map { period ->
+                        
                             HistoryItem(
-                                periodId = it.trackingPeriod.id,
-                                
-                                createdAt = it.trackingPeriod.createdAt,
-                                
-                                endedAt = it.trackingPeriod.endedAt,
-                                
-                                totalDuration = it.trackingPeriod.totalDurationMillis,
-                                
-                                sessionCount = it.sessions.size
+                        
+                                periodId = period.trackingPeriod.id,
+                        
+                                createdAt = period.trackingPeriod.createdAt,
+                        
+                                endedAt = period.trackingPeriod.endedAt,
+                        
+                                totalDuration = period.trackingPeriod.totalDurationMillis,
+                        
+                                sessionCount = period.sessions.size,
+                        
+                                sessions = period.sessions.map {
+                        
+                                    SessionHistoryItem(
+                        
+                                        sessionId = it.id,
+                        
+                                        startTime = it.startTime,
+                        
+                                        endTime = it.endTime,
+                        
+                                        duration = it.duration
+                        
+                                    )
+                        
+                                }
+                        
                             )
-
+                        
                         },
 
                         isLoading = false
@@ -58,7 +76,27 @@ class HistoryViewModel @Inject constructor(
         }
 
     }
+    fun toggleExpanded(
+    periodId: Long
+    ) {
 
+    _uiState.value = _uiState.value.copy(
+
+        periods = _uiState.value.periods.map {
+
+            if (it.periodId == periodId) {
+
+                it.copy(
+                    expanded = !it.expanded
+                )
+
+            } else it
+
+        }
+
+    )
+
+}    
     fun deletePeriod(periodId: Long) {
 
         viewModelScope.launch {
