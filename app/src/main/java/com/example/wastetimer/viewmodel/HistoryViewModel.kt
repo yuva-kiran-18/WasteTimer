@@ -6,6 +6,8 @@ import com.example.wastetimer.data.model.HistoryUiState
 import com.example.wastetimer.data.model.SessionUiModel
 import com.example.wastetimer.data.model.TrackingPeriodUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import com.example.wastetimer.data.local.entity.SessionEntity
+import com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
