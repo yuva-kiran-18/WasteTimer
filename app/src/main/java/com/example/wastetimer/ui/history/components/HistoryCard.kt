@@ -76,13 +76,9 @@ fun HistoryCard(
                     IconButton(
                         onClick = onExpand
                     ) {
-                        Icon(
-                            if (item.expanded)
-                                Icons.Default.ExpandLess
-                            else
-                                Icons.Default.ExpandMore,
-                            null
-                        )
+                        Text(
+    text = if (item.expanded) "▲" else "▼"
+)
                     }
 
                 }
