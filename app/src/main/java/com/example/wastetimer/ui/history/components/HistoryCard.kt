@@ -1,14 +1,8 @@
 package com.example.wastetimer.ui.history.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,39 +11,50 @@ import com.example.wastetimer.data.model.HistoryItem
 
 @Composable
 fun HistoryCard(
-    item: HistoryItem
+    item: HistoryItem,
+    onExpand: () -> Unit
 ) {
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onExpand()
+            }
     ) {
 
         Column(
-            modifier = Modifier.padding(16.dp)
+            Modifier.padding(16.dp)
         ) {
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Text(
+                "Tracking Period #${item.periodId}",
+                fontWeight = FontWeight.Bold
+            )
 
-                Text(
-                    text = "Period #${item.periodId}",
-                    fontWeight = FontWeight.Bold
-                )
+            Spacer(Modifier.height(8.dp))
 
-                Text(
-                    text = "${item.sessionCount} Sessions",
-                    style = MaterialTheme.typography.labelMedium
-                )
+            Text("Sessions : ${item.sessionCount}")
+
+            Text("Total : ${format(item.totalDuration)}")
+
+            if (item.expanded) {
+
+                Spacer(Modifier.height(12.dp))
+
+                item.sessions.forEach {
+
+                    SessionItem(
+
+                        title = "Session ${it.sessionId}",
+
+                        duration = format(it.duration)
+
+                    )
+
+                }
 
             }
-
-            Text(
-                text = "Total: ${formatDuration(item.totalDuration)}",
-                modifier = Modifier.padding(top = 8.dp)
-            )
 
         }
 
@@ -57,13 +62,14 @@ fun HistoryCard(
 
 }
 
-private fun formatDuration(duration: Long): String {
+private fun format(duration: Long): String {
 
-    val seconds = duration / 1000
+    val s = duration / 1000
 
-    val h = seconds / 3600
-    val m = (seconds % 3600) / 60
-    val s = seconds % 60
+    return "%02d:%02d:%02d".format(
+        s / 3600,
+        (s % 3600) / 60,
+        s % 60
+    )
 
-    return "%02d:%02d:%02d".format(h, m, s)
 }
