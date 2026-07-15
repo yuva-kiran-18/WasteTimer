@@ -12,12 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.wastetimer.data.model.TrackingPeriodUiModel
 import com.example.wastetimer.ui.history.components.DeletePeriodDialog
+import com.example.wastetimer.ui.history.components.EmptyHistory
 import com.example.wastetimer.ui.history.components.HistoryCard
 import com.example.wastetimer.viewmodel.HistoryViewModel
-import com.example.wastetimer.data.model.TrackingPeriodUiModel
-import com.example.wastetimer.data.model.SessionUiModel
-import com.example.wastetimer.data.model.HistoryUiState
 
 @Composable
 fun HistoryScreen(
@@ -28,7 +27,7 @@ fun HistoryScreen(
 
     var deleteItem by remember {
         mutableStateOf<TrackingPeriodUiModel?>(null)
-}
+    }
 
     if (state.isLoading) {
 
@@ -42,16 +41,29 @@ fun HistoryScreen(
         }
 
         return
+
+    }
+
+    if (state.periods.isEmpty()) {
+
+        EmptyHistory()
+
+        return
+
     }
 
     LazyColumn(
+
         modifier = Modifier.fillMaxSize(),
+
         verticalArrangement = Arrangement.spacedBy(12.dp),
+
         contentPadding = PaddingValues(16.dp)
+
     ) {
 
         items(
-            items = state.periods,
+            state.periods,
             key = { it.periodId }
         ) { item ->
 
@@ -60,11 +72,17 @@ fun HistoryScreen(
                 item = item,
 
                 onExpand = {
-                    viewModel.toggleExpanded(item.periodId)
+
+                    viewModel.toggleExpanded(
+                        item.periodId
+                    )
+
                 },
 
                 onDelete = {
+
                     deleteItem = item
+
                 }
 
             )
@@ -73,13 +91,15 @@ fun HistoryScreen(
 
     }
 
-    deleteItem?.let {
+    deleteItem?.let { period ->
 
         DeletePeriodDialog(
 
             onConfirm = {
 
-                viewModel.deletePeriod(it.periodId)
+                viewModel.deletePeriod(
+                    period.periodId
+                )
 
                 deleteItem = null
 
