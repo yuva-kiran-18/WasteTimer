@@ -17,10 +17,8 @@ class TimerRepository @Inject constructor(
 
     suspend fun getOrCreateActivePeriod(): TrackingPeriodEntity {
 
-        val existing = trackingPeriodDao.getActivePeriod()
-
-        if (existing != null) {
-            return existing
+        trackingPeriodDao.getActivePeriod()?.let {
+            return it
         }
 
         val now = System.currentTimeMillis()
@@ -30,44 +28,45 @@ class TimerRepository @Inject constructor(
                 createdAt = now
             )
         )
-        
+
         return TrackingPeriodEntity(
             id = id,
             createdAt = now
         )
+    }
 
     suspend fun saveSession(
         startTime: Long,
         endTime: Long
     ) {
 
-    require(endTime >= startTime) {
-        "End time cannot be before start time."
+        require(endTime >= startTime)
+
+        val period = getOrCreateActivePeriod()
+
+        sessionDao.insertSession(
+            SessionEntity(
+                trackingPeriodId = period.id,
+                startTime = startTime,
+                endTime = endTime,
+                duration = endTime - startTime
+            )
+        )
     }
 
-    val period = getOrCreateActivePeriod()
-
-    sessionDao.insertSession(
-        SessionEntity(
-            trackingPeriodId = period.id,
-            startTime = startTime,
-            endTime = endTime,
-            duration = endTime - startTime
-        )
-    )
-}
     suspend fun resetTracking() {
 
-        val active = trackingPeriodDao.getActivePeriod()
-            ?: return
+        val active =
+            trackingPeriodDao.getActivePeriod()
+                ?: return
 
-        val totalDuration =
+        val total =
             sessionDao.getTotalDuration(active.id)
 
         trackingPeriodDao.closePeriod(
             periodId = active.id,
             endedAt = System.currentTimeMillis(),
-            totalDuration = totalDuration
+            totalDuration = total
         )
 
         trackingPeriodDao.insertPeriod(
@@ -77,43 +76,44 @@ class TimerRepository @Inject constructor(
         )
     }
 
+    fun observeTrackingPeriods(): Flow<List<TrackingPeriodEntity>> =
+        trackingPeriodDao.getAllPeriods()
 
     fun getTrackingPeriodsWithSessions(): Flow<List<TrackingPeriodWithSessions>> =
-    trackingPeriodDao.getPeriodsWithSessions()
+        trackingPeriodDao.getPeriodsWithSessions()
 
     fun getSessionsForPeriod(
         periodId: Long
     ): Flow<List<SessionEntity>> =
         sessionDao.getSessionsForPeriod(periodId)
-        
-    fun observeTrackingPeriods(): Flow<List<TrackingPeriodEntity>> =
-    trackingPeriodDao.getAllPeriods()
 
     suspend fun getActiveTrackingPeriod(): TrackingPeriodEntity? =
         trackingPeriodDao.getActivePeriod()
-    
+
     suspend fun getCurrentPeriodTotalDuration(): Long {
-    
-        val period = trackingPeriodDao.getActivePeriod()
-            ?: return 0L
-    
+
+        val period =
+            trackingPeriodDao.getActivePeriod()
+                ?: return 0L
+
         return sessionDao.getTotalDuration(period.id)
     }
-    
+
     suspend fun getCurrentSessionCount(): Int {
-    
-        val period = trackingPeriodDao.getActivePeriod()
-            ?: return 0
-    
+
+        val period =
+            trackingPeriodDao.getActivePeriod()
+                ?: return 0
+
         return sessionDao.getSessionCount(period.id)
     }
-    
+
     suspend fun deleteTrackingPeriod(
         periodId: Long
     ) {
-    
+
         sessionDao.deleteSessions(periodId)
-    
         trackingPeriodDao.deletePeriod(periodId)
+
     }
 }
