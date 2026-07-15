@@ -8,6 +8,7 @@ import com.example.wastetimer.repository.TimerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.example.wastetimer.data.model.SessionHistoryItem
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
