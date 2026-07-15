@@ -10,7 +10,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,7 +36,8 @@ fun HistoryCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onExpand() }
+            .clickable { onExpand() },
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
 
         Column(
@@ -45,62 +49,85 @@ fun HistoryCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
 
-                Text(
-                    text = "Tracking Period #${item.periodId}",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Column {
 
-                IconButton(
-                    onClick = onDelete
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete"
+                    Text(
+                        "Tracking Period #${item.periodId}",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
+
+                    Text(
+                        TimeFormatter.formatDateTime(item.createdAt),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+
+                }
+
+                Row {
+
+                    IconButton(
+                        onClick = onDelete
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            null
+                        )
+                    }
+
+                    IconButton(
+                        onClick = onExpand
+                    ) {
+                        Icon(
+                            if (item.expanded)
+                                Icons.Default.ExpandLess
+                            else
+                                Icons.Default.ExpandMore,
+                            null
+                        )
+                    }
+
                 }
 
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(Modifier.height(12.dp))
 
-            InfoRow(
-                "Started",
-                TimeFormatter.formatDateTime(item.createdAt)
+            Text(
+                "Sessions : ${item.sessionCount}"
+            )
+
+            Text(
+                "Total : ${
+                    TimeFormatter.formatDuration(item.totalDuration)
+                }"
             )
 
             item.endedAt?.let {
 
-                InfoRow(
-                    "Ended",
-                    TimeFormatter.formatDateTime(it)
+                Text(
+                    "Ended : ${
+                        TimeFormatter.formatDateTime(it)
+                    }"
                 )
 
             }
 
-            InfoRow(
-                "Sessions",
-                item.sessionCount.toString()
-            )
+            if (item.expanded) {
 
-            InfoRow(
-                "Total",
-                TimeFormatter.formatDuration(item.totalDuration)
-            )
-
-            if (item.expanded && item.sessions.isNotEmpty()) {
-
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
                 Divider()
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(Modifier.height(8.dp))
 
-                item.sessions.forEach {
+                item.sessions.forEach { session ->
 
                     SessionItem(
-                        title = "Session #${it.sessionId}",
-                        duration = TimeFormatter.formatDuration(it.duration)
+                        title = "Session #${session.sessionId}",
+                        duration = TimeFormatter.formatDuration(
+                            session.duration
+                        )
                     )
 
                 }
@@ -108,30 +135,6 @@ fun HistoryCard(
             }
 
         }
-
-    }
-
-}
-
-@Composable
-private fun InfoRow(
-    title: String,
-    value: String
-) {
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-
-        Text(title)
-
-        Text(
-            value,
-            fontWeight = FontWeight.SemiBold
-        )
 
     }
 
