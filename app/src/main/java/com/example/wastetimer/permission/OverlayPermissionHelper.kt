@@ -1,4 +1,4 @@
-package com.example.wastetimer.utils
+package com.example.wastetimer.permission
 
 import android.content.Context
 import android.content.Intent
