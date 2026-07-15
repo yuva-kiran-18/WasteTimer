@@ -6,12 +6,12 @@ import com.example.wastetimer.data.model.HistoryUiState
 import com.example.wastetimer.data.model.SessionUiModel
 import com.example.wastetimer.data.model.TrackingPeriodUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import com.example.wastetimer.data.repository.TimerRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.example.wastetimer.data.repository.TimerRepository
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
