@@ -3,7 +3,8 @@ package com.example.wastetimer.di
 import android.content.Context
 import androidx.room.Room
 import com.example.wastetimer.data.local.AppDatabase
-import com.example.wastetimer.data.local.TimerDao
+import com.example.wastetimer.data.local.dao.SessionDao
+import com.example.wastetimer.data.local.dao.TrackingPeriodDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,19 +18,32 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ): AppDatabase {
+
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             "waste_timer_db"
         )
-        .fallbackToDestructiveMigration() // We will handle proper migrations later
-        .build()
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Provides
     @Singleton
-    fun provideTimerDao(database: AppDatabase): TimerDao {
-        return database.timerDao()
+    fun provideSessionDao(
+        database: AppDatabase
+    ): SessionDao {
+        return database.sessionDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideTrackingPeriodDao(
+        database: AppDatabase
+    ): TrackingPeriodDao {
+        return database.trackingPeriodDao()
     }
 }
