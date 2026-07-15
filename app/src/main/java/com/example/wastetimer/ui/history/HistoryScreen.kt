@@ -27,8 +27,8 @@ fun HistoryScreen(
     val state by viewModel.uiState.collectAsState()
 
     var deleteItem by remember {
-        mutableStateOf<HistoryItem?>(null)
-    }
+        mutableStateOf<TrackingPeriodUiModel?>(null)
+}
 
     if (state.isLoading) {
 
