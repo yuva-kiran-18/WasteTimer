@@ -2,6 +2,7 @@ package com.example.wastetimer.ui.dashboard.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,12 +18,12 @@ fun ResetDialog(
         onDismissRequest = onDismiss,
 
         title = {
-            Text("Reset Timer")
+            Text("Reset Tracking")
         },
 
         text = {
             Text(
-                "This will permanently close the current tracking period and start a new one."
+                "This will permanently close the current tracking period and start a new one.\n\nThis action cannot be undone."
             )
         },
 
@@ -31,7 +32,9 @@ fun ResetDialog(
             Button(
                 onClick = onConfirm
             ) {
+
                 Text("Reset")
+
             }
 
         },
@@ -41,7 +44,12 @@ fun ResetDialog(
             TextButton(
                 onClick = onDismiss
             ) {
-                Text("Cancel")
+
+                Text(
+                    "Cancel",
+                    color = MaterialTheme.colorScheme.primary
+                )
+
             }
 
         }
