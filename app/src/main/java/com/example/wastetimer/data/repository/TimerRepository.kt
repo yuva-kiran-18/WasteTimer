@@ -1,4 +1,4 @@
-package com.example.wastetimer.repository
+package com.example.wastetimer.data.repository
 
 import com.example.wastetimer.data.local.dao.SessionDao
 import com.example.wastetimer.data.local.dao.TrackingPeriodDao
