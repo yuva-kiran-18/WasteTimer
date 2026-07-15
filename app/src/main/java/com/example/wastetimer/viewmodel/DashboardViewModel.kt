@@ -3,7 +3,7 @@ package com.example.wastetimer.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wastetimer.data.model.DashboardState
-import com.example.wastetimer.repository.TimerRepository
+import com.example.wastetimer.data.repository.TimerRepository
 import com.example.wastetimer.service.TimerForegroundService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
