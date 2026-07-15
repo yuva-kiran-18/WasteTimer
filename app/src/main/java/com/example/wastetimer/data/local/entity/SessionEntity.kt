@@ -27,7 +27,6 @@ data class SessionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
 
-    @ColumnInfo(index = true)
     val trackingPeriodId: Long,
 
     val startTime: Long,
