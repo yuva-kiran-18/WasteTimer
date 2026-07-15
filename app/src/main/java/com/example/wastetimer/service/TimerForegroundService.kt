@@ -9,7 +9,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.example.wastetimer.MainActivity
-import com.example.wastetimer.repository.TimerRepository
+import com.example.wastetimer.data.repository.TimerRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
