@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.wastetimer.data.model.HistoryItem
+import com.example.wastetimer.data.model.TrackingPeriodUiModel
 import com.example.wastetimer.utils.TimeFormatter
 
 @Composable
