@@ -86,8 +86,10 @@ class TimerForegroundService : Service() {
 
         serviceScope.launch {
             try {
-                val periodId = timerRepository.getOrCreateActivePeriodId()
-                timerRepository.saveSession(periodId, startTime, sessionEndTime)
+                timerRepository.saveSession(
+                    startTime = startTime,
+                    endTime = sessionEndTime
+                )
             } finally {
                 stopForeground(STOP_FOREGROUND_REMOVE)
                 stopSelf()
