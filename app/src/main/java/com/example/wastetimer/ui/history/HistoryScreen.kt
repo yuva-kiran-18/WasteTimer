@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.wastetimer.data.model.HistoryItem
+import com.example.wastetimer.ui.history.components.DeletePeriodDialog
 import com.example.wastetimer.ui.history.components.HistoryCard
 import com.example.wastetimer.viewmodel.HistoryViewModel
 
@@ -24,13 +24,19 @@ fun HistoryScreen(
 
     val state by viewModel.uiState.collectAsState()
 
+    var deleteItem by remember {
+        mutableStateOf<HistoryItem?>(null)
+    }
+
     if (state.isLoading) {
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
+
             CircularProgressIndicator()
+
         }
 
         return
@@ -45,23 +51,45 @@ fun HistoryScreen(
         items(
             items = state.periods,
             key = { it.periodId }
-        ) { period ->
+        ) { item ->
 
             HistoryCard(
-            
-                item = period,
-            
+
+                item = item,
+
                 onExpand = {
-            
-                    viewModel.toggleExpanded(
-                        period.periodId
-                    )
-            
+                    viewModel.toggleExpanded(item.periodId)
+                },
+
+                onDelete = {
+                    deleteItem = item
                 }
-            
+
             )
 
         }
+
+    }
+
+    deleteItem?.let {
+
+        DeletePeriodDialog(
+
+            onConfirm = {
+
+                viewModel.deletePeriod(it.periodId)
+
+                deleteItem = null
+
+            },
+
+            onDismiss = {
+
+                deleteItem = null
+
+            }
+
+        )
 
     }
 
