@@ -17,46 +17,35 @@ class MainViewModel @Inject constructor(
     private val repository: TimerRepository
 ) : ViewModel() {
 
-    // Observe the live timer from the foreground service
-    val currentSessionMillis: StateFlow<Long> = TimerForegroundService.elapsedTime
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 0L
-        )
+    val currentSessionMillis: StateFlow<Long> =
+        TimerForegroundService.elapsedTime
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = 0L
+            )
 
-    // Formats the milliseconds into HH:MM:SS for the UI
-    val formattedCurrentSession: StateFlow<String> = currentSessionMillis.map { formatTime(it) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = "00:00:00"
-        )
-
-    // TODO: In a full implementation, we will fetch the active periodId from DataStore
-    // For now, we simulate a mock active period ID of 1
-    private val activePeriodId = 1L 
+    val formattedCurrentSession: StateFlow<String> =
+        currentSessionMillis
+            .map(::formatTime)
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = "00:00"
+            )
 
     fun resetTimer() {
         viewModelScope.launch {
-            val currentWasted = currentSessionMillis.value
-            if (currentWasted > 0) {
-                // 1. Save the final session
-                val endTime = System.currentTimeMillis()
-                val startTime = endTime - currentWasted
-                repository.saveSession(activePeriodId, startTime, endTime)
-            }
-            // 2. Create a brand new tracking period (History record)
-            repository.createNewResetPeriod()
-            
-            // Note: Stopping the service zeroes out the current timer
+            repository.resetTracking()
         }
     }
 
     private fun formatTime(millis: Long): String {
+
         val seconds = (millis / 1000) % 60
-        val minutes = (millis / (1000 * 60)) % 60
-        val hours = (millis / (1000 * 60 * 60))
+        val minutes = (millis / 60000) % 60
+        val hours = millis / 3600000
+
         return if (hours > 0) {
             String.format("%02d:%02d:%02d", hours, minutes, seconds)
         } else {
