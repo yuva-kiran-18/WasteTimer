@@ -13,7 +13,7 @@ class TimerRepository @Inject constructor(
 ) {
     suspend fun saveSession(periodId: Long, startTime: Long, endTime: Long) {
         require(endTime >= startTime) { "End time cannot be earlier than start time" }
-
+    
         val duration = endTime - startTime
         val session = SessionEntity(
             periodId = periodId,
@@ -22,8 +22,7 @@ class TimerRepository @Inject constructor(
             durationMillis = duration
         )
         timerDao.insertSession(session)
-        timerDao.updatePeriodTotal(periodId)
-    }
+}
 
     suspend fun getOrCreateActivePeriodId(): Long {
         val activePeriodId = timerDao.getLatestResetPeriodId()
@@ -44,17 +43,17 @@ class TimerRepository @Inject constructor(
     }
 
     suspend fun resetTracking(): Long {
-        val total = timerDao.getLatestPeriodTotalOnce() ?: 0L
-        val lastPeriodId = timerDao.getLatestResetPeriodId()
+    val lastPeriodId = timerDao.getLatestResetPeriodId()
 
-        if (lastPeriodId != null) {
-            timerDao.updatePeriodTotal(lastPeriodId)
-            timerDao.updatePeriodResetTotal(lastPeriodId, total)
-        }
-
-        return createNewResetPeriod()
+    if (lastPeriodId != null) {
+        val total = timerDao.getPeriodTotalOnce(lastPeriodId) ?: 0L
+        timerDao.updatePeriodTotal(lastPeriodId, total)
+        timerDao.updatePeriodResetTotal(lastPeriodId, total)
     }
 
+    return createNewResetPeriod()
+}
+    suspend fun getPeriodTotalOnce(periodId: Long): Long?
     fun getSessionsForPeriod(periodId: Long): Flow<List<SessionEntity>> {
         return timerDao.getSessionsForPeriod(periodId)
     }
