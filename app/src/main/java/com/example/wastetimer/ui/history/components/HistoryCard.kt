@@ -1,13 +1,23 @@
 package com.example.wastetimer.ui.history.components
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.wastetimer.data.model.HistoryItem
+import com.example.wastetimer.utils.TimeFormatter
 
 @Composable
 fun HistoryCard(
@@ -18,58 +28,86 @@ fun HistoryCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onExpand()
-            }
+            .clickable { onExpand() }
     ) {
 
         Column(
-            Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
 
             Text(
-                "Tracking Period #${item.periodId}",
+                text = "Tracking Period #${item.periodId}",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Text("Sessions : ${item.sessionCount}")
+            InfoRow(
+                title = "Started",
+                value = TimeFormatter.formatDateTime(item.createdAt)
+            )
 
-            Text("Total : ${format(item.totalDuration)}")
+            item.endedAt?.let {
+                InfoRow(
+                    title = "Ended",
+                    value = TimeFormatter.formatDateTime(it)
+                )
+            }
 
-            if (item.expanded) {
+            InfoRow(
+                title = "Sessions",
+                value = item.sessionCount.toString()
+            )
 
-                Spacer(Modifier.height(12.dp))
+            InfoRow(
+                title = "Total",
+                value = TimeFormatter.formatDuration(item.totalDuration)
+            )
 
-                item.sessions.forEach {
+            if (item.expanded && item.sessions.isNotEmpty()) {
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Divider()
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                item.sessions.forEach { session ->
 
                     SessionItem(
-
-                        title = "Session ${it.sessionId}",
-
-                        duration = format(it.duration)
-
+                        title = "Session #${session.sessionId}",
+                        duration = TimeFormatter.formatDuration(session.duration)
                     )
 
                 }
-
             }
-
         }
-
     }
-
 }
 
-private fun format(duration: Long): String {
+@Composable
+private fun InfoRow(
+    title: String,
+    value: String
+) {
 
-    val s = duration / 1000
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
 
-    return "%02d:%02d:%02d".format(
-        s / 3600,
-        (s % 3600) / 60,
-        s % 60
-    )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium
+        )
 
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
