@@ -18,7 +18,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.wastetimer.service.TimerForegroundService
-import com.example.wastetimer.ui.screens.DashboardScreen
+import com.example.wastetimer.ui.dashboard.DashboardScreen
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
