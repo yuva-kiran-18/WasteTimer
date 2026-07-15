@@ -31,7 +31,7 @@ class HistoryViewModel @Inject constructor(
 
             repository
                 .getTrackingPeriodsWithSessions()
-                .collect { periods ->
+                .collect { periods: List<com.example.wastetimer.data.local.relation.TrackingPeriodWithSessions> ->
 
                     _uiState.value = HistoryUiState(
 
