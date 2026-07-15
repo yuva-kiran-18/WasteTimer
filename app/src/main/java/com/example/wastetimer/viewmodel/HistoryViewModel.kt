@@ -36,17 +36,15 @@ class HistoryViewModel @Inject constructor(
                         periods = periods.map {
 
                             HistoryItem(
-
                                 periodId = it.trackingPeriod.id,
-
-                                startedAt = it.trackingPeriod.createdAt,
-
+                                
+                                createdAt = it.trackingPeriod.createdAt,
+                                
                                 endedAt = it.trackingPeriod.endedAt,
-
+                                
                                 totalDuration = it.trackingPeriod.totalDurationMillis,
-
+                                
                                 sessionCount = it.sessions.size
-
                             )
 
                         },
